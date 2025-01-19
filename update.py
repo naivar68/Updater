@@ -49,7 +49,10 @@ def update():
         3 yum
         4 dnf
         5. pacman and yay
-        6 exit
+        6 flatpak
+        7. pamac
+        8: snap
+        9. Exit
         """)
 
         choice = input("Enter your choice: ")
@@ -165,6 +168,27 @@ def update():
                 print("System updated successfully!")
                 print("Press any key to continue...")
                 input()
+                print("Now updating AUR packages with yay...")
+                sp.run(['yay', '-Syu', '--noconfirm'])
+                print("AUR packages updated successfully!")
+                print("Press any key to continue...")
+                input()
+                main()
+
+
+            except Exception as e:
+                print(f"An error occured: {e}")
+                print("Press any key to continue...")
+                input()
+                main()
+
+        elif choice == "6":
+            print("Updating the system with flatpak...")
+            try:
+                sp.run(['sudo','flatpak', 'update', '-y'])
+                print("System updated successfully!")
+                print("Press any key to continue...")
+                input()
                 main()
 
             except Exception as e:
@@ -173,7 +197,41 @@ def update():
                 input()
                 main()
 
-        elif choice == '6':
+        elif choice == "7":
+            print("Updating the system with pamac...")
+            try:
+                sp.run(['pamac', 'upgrade', '-y'])
+                print("System updated successfully!")
+                print("Press any key to continue...")
+                input()
+                main()
+
+            except Exception as e:
+                print(f"An error occured: {e}")
+                print("Press any key to continue...")
+                input()
+                main()
+
+
+        elif choice == "8":
+            print("Updating the system with snap...")
+            try:
+                sp.run(['sudo', 'snap', 'refresh'])
+                print("System updated successfully!")
+                print("Press any key to continue...")
+                input()
+                main()
+
+            except Exception as e:
+                print(f"An error occured: {e}")
+                print("Press any key to continue...")
+                input()
+                main()
+
+
+
+
+        elif choice == '9':
             print("Exiting the utility...")
             raise SystemExit
         else:

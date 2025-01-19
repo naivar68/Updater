@@ -1,5 +1,5 @@
 
-# Nala Update Utility
+# Multi Distro Update Utility
 
 ## Overview
 
