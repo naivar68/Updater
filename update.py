@@ -45,7 +45,7 @@ def update():
         print("Which package manager would you like to use?\n")
         print("""
         1. apt and apt-get
-        2 .nala package wrapper for Apt
+        2 nala package wrapper for Apt
         3 yum
         4 dnf
         5. pacman and yay
