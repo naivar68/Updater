@@ -1,293 +1,124 @@
-#! /usr/bin/python3
-
-# The multi-upgrade utility for Linux systems
-
+#!/usr/bin/python
 
 import subprocess as sp
+import datetime as dt
+import time
+from os import WCONTINUED
 
 
-# Upadte Function
+# Function to perform the BTRFS or RSYNC snapshot
+def snapshot():
+    date = dt.datetime.now()
+    print("The current date and time is: ", date)
+    print("Do you have a specific name you would like to give this update?")
+    name = input()
+    if name == '':
+        print("The update has been named: ", name)
+        print("Press Enter to continue.")
+        input()
+    else:
+        title = name
+        print("The update has been named: ", title)
+        print("Press Enter to continue.")
+        input()
+
+    try:
+        print("Creating a BTRFS snapshot of the system...")
+        if name == "":
+            print(f"The snapshot will be named: {name}")
+            print("Press Enter to continue.")
+            input()
+            sp.run(['sudo', 'timeshift', '--create', '--comments', name])
+        else:
+            print("The snapshot will be named: ", title)
+            print("Press Enter to continue.")
+            input()
+            sp.run(['sudo', 'timeshift', '--create', '--comments', title])
+
+    except sp.CalledProcessError as e:
+        print("An error occurred while trying to create the snapshot.")
+        print("Error: ", e)
+        print("Press Enter to continue.")
+        input()
+        print("Now attempting Timeshift with 'rsync'...")
+        try:
+            sp.run(['sudo', 'timeshift', '--create', '--comments', title])
+        except sp.CalledProcessError as e:
+            print(f"An {e} error occured...")
+            raise SystemExit
+
+            
+
+
+
+
+
 
 def update():
     sp.run(['clear'])
-    print("Preparing to update the system, \n")
-    print("Please select from the following options:")
-    print("""
-    1. Create a snapshot of the current system
-    2. Update the system
-    3. System reboot
-    """)
-
-    choice = input("Enter your choice: ")
-
-    if choice == '1':
-        print("Enter a name for the snapshot, or leave empty for none: ")
-        name = input()
-
-        try:
-            print("Creating snapshot with Timeshift...")
-            sp.run(['sudo', 'timeshift', '--create', '--comment', name])
-            print(f"Snapshot {name} created successfully!")
-            print("Here is a list of your snapshots for confirmation:\n")
-            sp.run(['sudo', 'timeshift', '--list'])
-            print("\n")
-            print("Press any key to continue...")
-            input()
-            main()
-        except Exception as e:
-            print(f"An error occured: {e}")
-            print("Press any key to continue...")
-            input()
-            main()
-
-    elif choice == '2':
-        sp.run(['clear'])
-        print("Which package manager would you like to use?\n")
-        print("""
-        1. apt and apt-get
-        2 nala package wrapper for Apt
-        3 yum
-        4 dnf
-        5. pacman and yay
-        6 flatpak
-        7. pamac
-        8: snap
-        9. Exit
-        """)
-
-        choice = input("Enter your choice: ")
-
-        if choice == '1':
-            print("Updating the system with apt and apt-get...")
-            try:
-                sp.run(['sudo', 'apt', 'update', '-y'])
-                sp.run(['sudo', 'apt', 'upgrade', '-y'])
-                print("System updated successfully!")
-                print("do you need to upgrade the distribution? (y/n)")
-                dist = input()
-                distro = dist.lower()
-
-                if distro == 'y':
-                    print("Upgrading the distribution...")
-
-                    try:
-                        sp.run(['sudo', 'apt', 'dist-upgrade', '-y'])
-                        print("Distribution upgraded successfully!")
-                        print("Press any key to continue...")
-                        input()
-                        main()
-
-                    except Exception as e:
-                        print(f"An error occured: {e}")
-                        print("Press any key to continue...")
-                        input()
-                        main()
-                else:
-                    print("Distribution upgrade skipped.")
-                    print("Press any key to continue...")
-                    input()
-                    main()
-
-            except Exception as e:
-                print(f"An error occured: {e}")
-                print("Press any key to continue...")
-                input()
-                main()
-
-        elif choice == '2':
-            print("Updating the system with nala package wrapper for Apt...")
-            try:
-                sp.run(['sudo', 'nala', 'update', '-y'])
-                sp.run(['sudo', 'nala', 'upgrade', '-y'])
-                print("System updated successfully!")
-                print("do you need to upgrade the distribution? (y/n)")
-                dist = input()
-                distro = dist.lower()
-
-                if distro == 'y':
-                    print("Upgrading the distribution...")
-
-                    try:
-                        sp.run(['sudo', 'nala', 'dist-upgrade', '-y'])
-                        print("Distribution upgraded successfully!")
-                        print("Press any key to continue...")
-                        input()
-                        main()
-
-                    except Exception as e:
-                        print(f"An error occured: {e}")
-                        print("Press any key to continue...")
-                        input()
-                        main()
-                else:
-                    print("Distribution upgrade skipped.")
-                    print("Press any key to continue...")
-                    input()
-                    main()
-
-            except Exception as e:
-                print(f"An error occured: {e}")
-                print("Press any key to continue...")
-                input()
-                main()
-
-        elif choice == '3':
-            print("Updating the system with yum...")
-            try:
-                sp.run(['sudo', 'yum', 'update', '-y'])
-                print("System updated successfully!")
-                print("Press any key to continue...")
-                input()
-                main()
-
-            except Exception as e:
-                print(f"An error occured: {e}")
-                print("Press any key to continue...")
-                input()
-                main()
-
-        elif choice == '4':
-            print("Updating the system with dnf...")
-            try:
-                sp.run(['sudo', 'dnf', 'update', '-y'])
-                print("System updated successfully!")
-                print("Press any key to continue...")
-                input()
-                main()
-
-            except Exception as e:
-                print(f"An error occured: {e}")
-                print("Press any key to continue...")
-                input()
-                main()
-
-        elif choice == '5':
-            print("Updating the system with pacman and yay...")
-            try:
-                sp.run(['sudo', 'pacman', '-Syu', '--noconfirm'])
-                print("System updated successfully!")
-                print("Press any key to continue...")
-                input()
-                print("Now updating AUR packages with yay...")
-                sp.run(['yay', '-Syu', '--noconfirm'])
-                print("AUR packages updated successfully!")
-                print("Press any key to continue...")
-                input()
-                main()
-
-
-            except Exception as e:
-                print(f"An error occured: {e}")
-                print("Press any key to continue...")
-                input()
-                main()
-
-        elif choice == "6":
-            print("Updating the system with flatpak...")
-            try:
-                sp.run(['sudo','flatpak', 'update', '-y'])
-                print("System updated successfully!")
-                print("Press any key to continue...")
-                input()
-                main()
-
-            except Exception as e:
-                print(f"An error occured: {e}")
-                print("Press any key to continue...")
-                input()
-                main()
-
-        elif choice == "7":
-            print("Updating the system with pamac...")
-            try:
-                sp.run(['pamac', 'upgrade', '-y'])
-                print("System updated successfully!")
-                print("Press any key to continue...")
-                input()
-                main()
-
-            except Exception as e:
-                print(f"An error occured: {e}")
-                print("Press any key to continue...")
-                input()
-                main()
-
-
-        elif choice == "8":
-            print("Updating the system with snap...")
-            try:
-                sp.run(['sudo', 'snap', 'refresh'])
-                print("System updated successfully!")
-                print("Press any key to continue...")
-                input()
-                main()
-
-            except Exception as e:
-                print(f"An error occured: {e}")
-                print("Press any key to continue...")
-                input()
-                main()
-
-
-
-
-        elif choice == '9':
-            print("Exiting the utility...")
-            raise SystemExit
-        else:
-            print("Invalid choice, please try again.")
-            print("Press any key to continue...")
-            input()
-            main()
-
-    elif choice == '3':
-        print("Rebooting the system...")
-        try:
-            sp.run(['sudo', 'reboot'])
-        except Exception as e:
-            print(f"An error occured: {e}")
-            print("Press any key to continue...")
-            input()
-            main()
-
+    print("About to start a full system upgrade...")
+    print("Are you running Debian[Ubuntu], Arch Linux, or Fedora?")
+    system = input()
+    if system.lower() == "Debian":
+        print(f"updating {system}...")
+        sp.run(['sudo', 'apt' 'update'])
+        sp.run(['sudo', 'apt' 'upgrade', '-y'])
+        sp.run(['sudo', 'apt-get' 'update'])
+        sp.run(['sudo', 'apt-get', 'upgrade', '-y'])
+    elif system.lower() == "Fedora":
+        sp.run(['sudo', 'yum', 'upgrade'])
     else:
-        print("Invalid choice, please try again.")
-        print("Press any key to continue...")
-        input()
-        main()
+        pass
 
+    print("Press Enter to continue.")
+    input()
 
+    # The update script
 
+    sp.run(['sudo', 'pacman', '-Syu'])
 
+    # yay
+    sp.run(['yay', '-Syu'])
+    # pamac
+    sp.run(['pamac', 'upgrade'])
+    # snap
+    sp.run(['sudo', 'snap', 'refresh'])
+    # flatpak
+    sp.run(['sudo', 'flatpak', 'upgrade'])
 
-# Main Function
+    # Conclusion of script
+
+    print("If core modules have been updated you will want to reboot.")
+    print("Do you wish to reboot the system? [y/n]")
+    answer = input()
+
+    if answer.lower() == 'y':
+        sp.run(['sudo', 'systemctl', 'reboot'])
+    else:
+        print("Goodbye!")
+        raise SystemExit
+
 
 def main():
     sp.run(['clear'])
-    print("Welcome to the Nala Update Utility!")
-    print("Please select from the following options:")
-    print("""
-    1. Update the system
-    2. Exit
-    """)
+    print("Starting update process...")
+    print("Continue?[y/n] ")
+    input()
+    snapshot()
 
-    choice = input("Enter your choice: ")
 
-    if choice == '1':
+    print("Do you wish to update the system now? [y/n]")
+    query = input()
+    if query.lower() == 'y':
         update()
-    elif choice == '2':
-        print("Exiting the utility...")
-        exit()
     else:
-        print("Invalid choice, please try again.")
-        print("Press any key to continue...")
-        input()
-        main()
+        print("Goodbye!")
+        raise SystemExit
 
-# Main Function Call
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
+    
 
-
+    
