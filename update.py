@@ -1,24 +1,22 @@
-#!/usr/bin/python
-
+#!/usr/bin/python3
 import subprocess as sp
 import datetime as dt
 import time
-from os import WCONTINUED
-
+import os
 
 # Function to perform the BTRFS or RSYNC snapshot
 def snapshot():
     date = dt.datetime.now()
-    print("The current date and time is: ", date)
+    print(f"The current date and time is: {date}")
     print("Do you have a specific name you would like to give this update?")
-    name = input()
+    name = input().strip()  # Added strip method to remove whitespace from input
     if name == '':
         print("The update has been named: ", name)
         print("Press Enter to continue.")
         input()
     else:
-        title = name
-        print("The update has been named: ", title)
+        title = name.strip()  # Modified line for correct variable assignment
+        print(f"The update has been named: {title}")
         print("Press Enter to continue.")
         input()
 
@@ -30,14 +28,13 @@ def snapshot():
             input()
             sp.run(['sudo', 'timeshift', '--create', '--comments', name])
         else:
-            print("The snapshot will be named: ", title)
+            print(f"The snapshot will be named: {title}")
             print("Press Enter to continue.")
             input()
             sp.run(['sudo', 'timeshift', '--create', '--comments', title])
-
     except sp.CalledProcessError as e:
-        print("An error occurred while trying to create the snapshot.")
-        print("Error: ", e)
+        print(f"An error occurred while trying to create the snapshot.")
+        print(f"Error: {e}")
         print("Press Enter to continue.")
         input()
         print("Now attempting Timeshift with 'rsync'...")
@@ -47,51 +44,40 @@ def snapshot():
             print(f"An {e} error occured...")
             raise SystemExit
 
-            
-
-
-
-
-
 
 def update():
     sp.run(['clear'])
     print("About to start a full system upgrade...")
     print("Are you running Debian[Ubuntu], Arch Linux, or Fedora?")
-    system = input()
-    if system.lower() == "Debian":
+    system = input().strip()  # Added strip method to remove whitespace from input
+    if system.lower() == "debian":
         print(f"updating {system}...")
-        sp.run(['sudo', 'apt' 'update'])
-        sp.run(['sudo', 'apt' 'upgrade', '-y'])
-        sp.run(['sudo', 'apt-get' 'update'])
+        sp.run(['sudo', 'apt', 'update'])
+        sp.run(['sudo', 'apt', 'upgrade', '-y'])
+        sp.run(['sudo', 'apt-get', 'update'])
         sp.run(['sudo', 'apt-get', 'upgrade', '-y'])
-    elif system.lower() == "Fedora":
+    elif system.lower() == "fedora":
         sp.run(['sudo', 'yum', 'upgrade'])
+    elif system.lower() == "arch":
+        sp.run(['sudo', 'pacman', '-Syu'])
+        sp.run(['yay', '-Syu'])
+        sp.run(['pamac', 'upgrade'])
+        
     else:
-        pass
+        print("Please enter a valid response: 'Arch' 'Debian' 'Fedora'")
+        raise SystemExit
 
-    print("Press Enter to continue.")
-    input()
-
-    # The update script
-
-    sp.run(['sudo', 'pacman', '-Syu'])
-
-    # yay
-    sp.run(['yay', '-Syu'])
-    # pamac
-    sp.run(['pamac', 'upgrade'])
+    print("Now updating 'snap' and 'flatpak'")
     # snap
     sp.run(['sudo', 'snap', 'refresh'])
     # flatpak
     sp.run(['sudo', 'flatpak', 'upgrade'])
 
     # Conclusion of script
-
+    
     print("If core modules have been updated you will want to reboot.")
     print("Do you wish to reboot the system? [y/n]")
-    answer = input()
-
+    answer = input().strip()  # Added strip method to remove whitespace from input
     if answer.lower() == 'y':
         sp.run(['sudo', 'systemctl', 'reboot'])
     else:
@@ -103,12 +89,11 @@ def main():
     sp.run(['clear'])
     print("Starting update process...")
     print("Continue?[y/n] ")
-    input()
+    input()  # Removed print statement to remove unnecessary line
     snapshot()
 
-
     print("Do you wish to update the system now? [y/n]")
-    query = input()
+    query = input().strip()  # Added strip method to remove whitespace from input
     if query.lower() == 'y':
         update()
     else:
@@ -118,7 +103,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    
-
     
