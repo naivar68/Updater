@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 import subprocess as sp
 import datetime as dt
-import time
-import os
+
 
 # Function to perform the BTRFS or RSYNC snapshot
 def snapshot():
@@ -23,14 +22,9 @@ def snapshot():
     try:
         print("Creating a BTRFS snapshot of the system...")
         if name == "":
-            print(f"The snapshot will be named: {name}")
-            print("Press Enter to continue.")
-            input()
             sp.run(['sudo', 'timeshift', '--create', '--comments', name])
         else:
             print(f"The snapshot will be named: {title}")
-            print("Press Enter to continue.")
-            input()
             sp.run(['sudo', 'timeshift', '--create', '--comments', title])
     except sp.CalledProcessError as e:
         print(f"An error occurred while trying to create the snapshot.")
@@ -48,7 +42,7 @@ def snapshot():
 def update():
     sp.run(['clear'])
     print("About to start a full system upgrade...")
-    print("Are you running Debian[Ubuntu], Arch Linux, or Fedora?")
+    print("Are you running Debian[Ubuntu], Arch Linux, or Fedora?[type 'debian', 'arch', or 'fedora']")
     system = input().strip()  # Added strip method to remove whitespace from input
     if system.lower() == "debian":
         print(f"updating {system}...")
@@ -65,7 +59,7 @@ def update():
         
     else:
         print("Please enter a valid response: 'Arch' 'Debian' 'Fedora'")
-        raise SystemExit
+        update()
 
     print("Now updating 'snap' and 'flatpak'")
     # snap
