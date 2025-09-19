@@ -51,7 +51,7 @@ def update():
         sp.run(['sudo', 'apt-get', 'update'])
         sp.run(['sudo', 'apt-get', 'upgrade', '-y'])
     elif system.lower() == "fedora":
-        sp.run(['sudo', 'yum', 'upgrade'])
+        sp.run(['sudo', 'dnf', 'upgrade'])
     elif system.lower() == "arch":
         sp.run(['sudo', 'pacman', '-Syu'])
         sp.run(['yay', '-Syu'])
